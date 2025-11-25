@@ -59,4 +59,4 @@ def writing(moments, col):
 def preprocessing(df):
     print(df.head())
     print(df.describe(include="all"))
-    print(
+    print(df.info())
