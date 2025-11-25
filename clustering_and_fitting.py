@@ -27,6 +27,10 @@ from sklearn.linear_model import LinearRegression
 def plot_relational_plot(df):
     """Scatter plot using first 2 numeric columns."""
     num_cols = df.select_dtypes(include=[float, int]).columns
+    if len(num_cols) < 2:
+        print("Not enough numeric columns for relational plot.")
+        return
+
     x, y = num_cols[0], num_cols[1]
 
     plt.figure(figsize=(7, 5))
@@ -49,7 +53,13 @@ def plot_categorical_plot(df):
 def plot_statistical_plot(df):
     """Correlation heatmap of numeric columns."""
     plt.figure(figsize=(8, 6))
-    sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
+    corr = df.corr(numeric_only=True)
+
+    if corr.empty:
+        print("No numeric columns for correlation heatmap.")
+        return
+
+    sns.heatmap(corr, annot=True, cmap="coolwarm")
     plt.title("Statistical Plot (Correlation Heatmap)")
     plt.savefig('statistical_plot.png')
     plt.close()
@@ -66,7 +76,7 @@ def statistical_analysis(df, col):
     mean = series.mean()
     stddev = series.std()
     skew = ss.skew(series)
-    kurt = ss.kurtosis(series)   # excess kurtosis
+    kurt = ss.kurtosis(series)  # excess kurtosis
 
     return mean, stddev, skew, kurt
 
@@ -78,7 +88,7 @@ def writing(moments, col):
     print(f'Mean = {mean:.2f}, Standard Deviation = {stddev:.2f}, '
           f'Skewness = {skew:.2f}, Excess Kurtosis = {kurt:.2f}.')
 
-    # Better interpretation
+    # Interpretation
     if abs(skew) < 0.5:
         skew_type = "approximately symmetric"
     elif skew > 0.5:
@@ -170,7 +180,6 @@ def plot_clustered_data(labels, data, xkmeans, ykmeans, centre_labels):
 
     plt.scatter(xkmeans, ykmeans, s=200, color='red', label="Centers", marker="X")
 
-    # Label the centers
     for i, (cx, cy) in enumerate(zip(xkmeans, ykmeans)):
         plt.text(cx, cy, f"C{i}", fontsize=12, color="red")
 
@@ -193,7 +202,6 @@ def perform_fitting(df, col1, col2):
     model = LinearRegression()
     model.fit(X, y)
 
-    # Fixed linspace shape!
     x_line = np.linspace(X[col1].min(), X[col1].max(), 200).reshape(-1, 1)
     y_line = model.predict(x_line)
 
@@ -244,7 +252,7 @@ def main():
     )
     plot_clustered_data(labels, data, xkmeans, ykmeans, cenlabels)
 
-    # Fitting (using next two numeric columns)
+    # Fitting
     data_fit, x_line, y_line = perform_fitting(
         df, numeric_cols[1], numeric_cols[2]
     )
