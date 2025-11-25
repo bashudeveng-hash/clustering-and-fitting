@@ -35,7 +35,7 @@ def plot_statistical_plot(df):
     corr = df.corr(numeric_only=True)
     if corr.empty:
         return
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(8,6))
     sns.heatmap(corr, annot=True, cmap="coolwarm")
     plt.title("Statistical Plot")
     plt.savefig("statistical_plot.png")
